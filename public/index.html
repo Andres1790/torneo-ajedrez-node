@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Herramienta para planificar un torneo de ajedrez y consultar su presupuesto.">
+  <title>Planificador de torneo de ajedrez</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <p class="eyebrow">GESTIÓN Y PLANIFICACIÓN DE COMPETENCIAS</p>
+      <h1>♟ Planificador de torneo de ajedrez</h1>
+      <p>Organiza los datos de tu competencia y consulta al instante el espacio y el presupuesto estimado.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel form-panel" aria-labelledby="datos-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow dark">DATOS DEL TORNEO</p>
+          <h2 id="datos-title">Configura tu competencia</h2>
+        </div>
+        <span class="tag">Valores en COP</span>
+      </div>
+
+      <form id="tournament-form">
+        <div class="form-grid">
+          <label>
+            Cantidad de participantes
+            <input id="participants" type="number" min="1" max="500" step="1" value="32" required>
+            <small>Se calcula una mesa por cada dos jugadores.</small>
+          </label>
+
+          <label>
+            Valor de inscripción por jugador
+            <div class="input-money"><span>$</span><input id="fee" type="number" min="0" step="1000" value="40000" required></div>
+            <small>Cuota de participación por jugador.</small>
+          </label>
+
+          <label>
+            Área por mesa (m²)
+            <input id="area-per-table" type="number" min="0.1" step="0.1" value="4" required>
+          </label>
+
+          <label>
+            Área adicional (m²)
+            <input id="extra-area" type="number" min="0" step="0.5" value="24" required>
+          </label>
+        </div>
+
+        <details class="assumptions">
+          <summary>Ver y modificar los costos estimados</summary>
+          <div class="form-grid cost-inputs">
+            <label>Alquiler del espacio (COP)<input id="rent" type="number" min="0" step="1000" value="150000"></label>
+            <label>Pago del árbitro (COP)<input id="arbiter" type="number" min="0" step="1000" value="120000"></label>
+            <label>Adecuación del lugar (COP)<input id="setup" type="number" min="0" step="1000" value="50000"></label>
+            <label>Refrigerio por jugador (COP)<input id="snack" type="number" min="0" step="500" value="8000"></label>
+            <label>Material impreso por jugador (COP)<input id="materials" type="number" min="0" step="500" value="2000"></label>
+            <label>Medallas para los 3 ganadores (COP)<input id="medals" type="number" min="0" step="1000" value="90000"></label>
+            <label>Diseño de certificados digitales (COP)<input id="digital-certificates" type="number" min="0" step="1000" value="8000"></label>
+          </div>
+        </details>
+
+        <div class="actions">
+          <button class="button primary" type="submit">Actualizar planificación</button>
+          <button class="button secondary" type="button" id="reset-button">Restablecer valores iniciales</button>
+        </div>
+        <p id="form-message" class="form-message" role="alert"></p>
+      </form>
+    </section>
+
+    <section class="results" id="results" aria-live="polite">
+      <div class="section-heading results-heading">
+        <div>
+          <p class="eyebrow dark">RESULTADOS</p>
+          <h2>Resumen de planificación</h2>
+        </div>
+        <span class="tag success-tag" id="status-tag">Cálculo realizado</span>
+      </div>
+
+      <div class="metric-grid">
+        <article class="metric-card">
+          <span>Participantes</span>
+          <strong id="result-participants">32</strong>
+          <small id="result-tables">16 mesas de juego</small>
+        </article>
+        <article class="metric-card">
+          <span>Área requerida</span>
+          <strong id="result-area">88 m²</strong>
+          <small>Mesas + circulación</small>
+        </article>
+        <article class="metric-card">
+          <span>Costo total</span>
+          <strong id="result-cost">$738.000</strong>
+          <small id="selected-recognition">Reconocimientos más económicos</small>
+        </article>
+        <article class="metric-card">
+          <span>Ingresos por inscripción</span>
+          <strong id="result-income">$1.280.000</strong>
+          <small>Inscripción × participantes</small>
+        </article>
+      </div>
+
+      <article class="panel chart-panel" aria-labelledby="chart-title">
+        <div class="chart-heading">
+          <div>
+            <h3 id="chart-title">Comparativo de ingresos y costos</h3>
+            <p class="muted">La gráfica se actualiza al modificar los datos del torneo.</p>
+          </div>
+          <span class="chart-unit">COP</span>
+        </div>
+        <div id="finance-chart" class="finance-chart" role="img" aria-label="Gráfica comparativa de ingresos y costos">
+          <div class="chart-row"><span>Ingresos</span><div class="chart-track"><div class="chart-bar income-bar" id="income-bar"></div></div><strong id="chart-income">$1.280.000</strong></div>
+          <div class="chart-row"><span>Costos</span><div class="chart-track"><div class="chart-bar cost-bar" id="cost-bar"></div></div><strong id="chart-cost">$738.000</strong></div>
+        </div>
+        <p class="chart-result" id="chart-result">Excedente estimado: $542.000</p>
+      </article>
+
+      <div class="two-column">
+        <article class="panel">
+          <h3>Detalle del presupuesto</h3>
+          <div class="breakdown-row"><span>Costos fijos de organización</span><strong id="fixed-cost">$320.000</strong></div>
+          <div class="breakdown-row"><span>Medallas y certificados digitales</span><strong id="recognition-cost">$98.000</strong></div>
+          <div class="breakdown-row"><span>Costos variables</span><strong id="variable-cost">$320.000</strong></div>
+          <div class="breakdown-row total-row"><span>Costo total</span><strong id="total-cost">$738.000</strong></div>
+        </article>
+
+        <article class="panel surplus-panel">
+          <h3>Resultado económico</h3>
+          <p class="muted">Ingresos menos costos</p>
+          <strong class="surplus-value" id="result-surplus">$542.000</strong>
+          <p id="surplus-explanation">Excedente estimado para el torneo.</p>
+          <div class="breakdown-row"><span>Punto de equilibrio</span><strong id="break-even">14 participantes</strong></div>
+        </article>
+      </div>
+
+      <article class="panel comparison-panel">
+        <h3>Comparación de reconocimientos</h3>
+        <p class="muted">La comparación se calcula para la cantidad de participantes ingresada.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Alternativa</th><th>Descripción</th><th>Costo estimado</th></tr></thead>
+            <tbody>
+              <tr><td>A</td><td>Medallas metálicas + certificados impresos</td><td id="option-a">$122.000</td></tr>
+              <tr><td>B</td><td>Medallas personalizadas + certificados impresos</td><td id="option-b">$152.000</td></tr>
+              <tr class="recommended"><td>C</td><td>Medallas metálicas + certificados digitales</td><td id="option-c">$98.000</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="recommendation" id="recommendation">Recomendación: alternativa C para 32 participantes.</p>
+      </article>
+    </section>
+
+
+  </main>
+
+  <footer>
+    <p>Planificador de torneo de ajedrez · Herramienta de apoyo para la organización</p>
+  </footer>
+</body>
+</html>

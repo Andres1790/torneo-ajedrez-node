@@ -1,0 +1,9 @@
+{
+  "name": "planificador-torneo-ajedrez",
+  "version": "1.0.0",
+  "description": "Aplicación educativa para calcular área, costos e ingresos de un torneo de ajedrez.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
